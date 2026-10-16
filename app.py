@@ -3,7 +3,7 @@ import scipy.stats
 import streamlit as st
 import time
 
-# estas são variáveis persistentes preservadas à medida que o Streamlin executa novamente esse script
+# estas são variáveis persistentes preservadas à medida que o Streamlit executa novamente esse script
 if 'experiment_no' not in st.session_state:
     st.session_state['experiment_no'] = 0
 
@@ -12,7 +12,10 @@ if 'df_experiment_results' not in st.session_state:
 
 st.header('Jogando uma moeda')
 
-chart = st.line_chart([0.5])
+# O gráfico fica num espaço reservado e é redesenhado a cada lançamento
+# (o add_rows() que eu usava saiu das versões novas do Streamlit).
+chart = st.empty()
+chart.line_chart([0.5])
 
 def toss_coin(n):
 
@@ -21,13 +24,15 @@ def toss_coin(n):
     mean = None
     outcome_no = 0
     outcome_1_count = 0
+    means = []
 
     for r in trial_outcomes:
         outcome_no +=1
         if r == 1:
             outcome_1_count += 1
         mean = outcome_1_count / outcome_no
-        chart.add_rows([mean])
+        means.append(mean)
+        chart.line_chart(means)
         time.sleep(0.05)
 
     return mean
